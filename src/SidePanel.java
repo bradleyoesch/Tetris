@@ -1,8 +1,19 @@
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.io.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Random;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  * The side panel. It contains the score, level, next piece, pause button,
@@ -11,13 +22,13 @@ import java.util.Random;
  * @author Bradley Oesch
  * @version 1.0
  */
-
 public class SidePanel extends JPanel {
 	
-	private int score, lastScore, level;
+	private static final long serialVersionUID = 2241986028239084232L;
+	private int score, lastScore;
 	private boolean isPaused, changeDelay;
 	private PlayingField board;
-	private JLabel scoreLabel, levelLabel;
+	private JLabel scoreLabel, levelLabel, lineLabel;
 	private JButton pauseButton, saveButton, loadButton;
 	private static NextPiecePanel nextPiecePanel;
 	private Piece thisPiece, nextPiece;
@@ -28,7 +39,6 @@ public class SidePanel extends JPanel {
 		board = new PlayingField();
 		setPreferredSize(new Dimension(120, board.getHeight()));
 		
-		level = 1;
 		score = 0;
 		isPaused = false;
 		changeDelay = false;
@@ -39,6 +49,9 @@ public class SidePanel extends JPanel {
 		
 		scoreLabel = new JLabel("Points: " + board.getScore());
 		add(scoreLabel);
+		
+		lineLabel = new JLabel("Lines: " + board.getLines());
+		add(lineLabel);
 		
 		nextPiecePanel = new NextPiecePanel();
 		add(nextPiecePanel);
@@ -65,7 +78,6 @@ public class SidePanel extends JPanel {
 	/**
 	 * Updates the buttons and repaints the other panel.
 	 */
-	
 	public void updateGUI() {
 		changeDelay = false;
 		score = board.getScore();
@@ -84,6 +96,7 @@ public class SidePanel extends JPanel {
 		}
 		levelLabel.setText("Level: " + board.getLevel());
 		scoreLabel.setText("Points: " + board.getScore());
+		lineLabel.setText("Lines: " + board.getLines());
 		nextPiecePanel.repaint();
 	}
 	
@@ -92,7 +105,6 @@ public class SidePanel extends JPanel {
 	 * 
 	 * @return The current piece.
 	 */
-	
 	public Piece createPiece() {
 		thisPiece = nextPiece;
 		
@@ -120,7 +132,6 @@ public class SidePanel extends JPanel {
 	 *
 	 * @return If the game is paused.
 	 */
-	
 	public boolean isPaused() {
 		return isPaused;
 	}
@@ -130,7 +141,6 @@ public class SidePanel extends JPanel {
 	 *
 	 * @return If the delay should be changed.
 	 */
-	
 	public boolean getChangeDelay() {
 		return changeDelay;
 	}
@@ -138,21 +148,14 @@ public class SidePanel extends JPanel {
 	/**
 	 * Returns the board.
 	 */
-	
 	public void resetBoard() {
 		board = new PlayingField();
 		updateGUI();
 	}
 	
 	/**
-	 * ihashvaljvaivruviulrinriurenirealianiinlinlrnira
-	 * ihashvaljvaivruviulrinriurenirealianiinlinlrnira
-	 * ihashvaljvaivruviulrinriurenirealianiinlinlrnira
-	 * ihashvaljvaivruviulrinriurenirealianiinlinlrnira
-	 * ihashvaljvaivruviulrinriurenirealianiinlinlrnira
-	 * ihashvaljvaivruviulrinriurenirealianiinlinlrnira
+	 * Sets the board.
 	 */
-	
 	public void setBoard(PlayingField board) {
 		this.board = board;
 	}
@@ -162,7 +165,6 @@ public class SidePanel extends JPanel {
 	 *
 	 * @return The board.
 	 */
-	
 	public PlayingField getBoard() {
 		return board;
 	}
@@ -173,7 +175,6 @@ public class SidePanel extends JPanel {
 	 * @author Bradley Oesch
 	 * @version 1.0
 	 */
-	
 	private class PauseListener implements ActionListener {
 	
 		public void actionPerformed(ActionEvent e) {
@@ -192,9 +193,10 @@ public class SidePanel extends JPanel {
 	 * @author Bradley Oesch
 	 * @version 1.0
 	 */
-	
 	private class NextPiecePanel extends JPanel {
 		
+		private static final long serialVersionUID = -1266476213190231655L;
+
 		public NextPiecePanel() {
 			setBackground(new Color(35, 35, 35));
 			setPreferredSize(new Dimension(80, 80));
@@ -202,7 +204,7 @@ public class SidePanel extends JPanel {
 		
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			nextPiece.draw(g, board.getWSize(), board.getHSize(), true);
+			nextPiece.draw(g, board.getWSize(), board.getHSize(), false);
 		}
 	}
 
@@ -213,7 +215,6 @@ public class SidePanel extends JPanel {
 	 * @author Bradley Oesch
 	 * @version 1.0
 	 */
-	
 	private class SaveListener implements ActionListener {
 	
 		public void actionPerformed(ActionEvent event) {
@@ -243,9 +244,10 @@ public class SidePanel extends JPanel {
 	 * @author Bradley Oesch
 	 * @version 1.0
 	 */
-	
 	private class LoadListener extends JPanel implements ActionListener {
 	
+		private static final long serialVersionUID = -4430931677559941067L;
+
 		public void actionPerformed(ActionEvent event) {
 			try {
 				FileInputStream fileIn = new FileInputStream("savedGame.ser");

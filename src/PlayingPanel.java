@@ -1,9 +1,13 @@
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.Popup;
-import java.io.*;
-import java.util.Random;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.Timer;
 
 /**
  * The panel for the Tetris board.
@@ -11,12 +15,11 @@ import java.util.Random;
  * @author Bradley Oesch
  * @version 1.0
  */
-
 public class PlayingPanel extends JPanel {
 	
+	private static final long serialVersionUID = 4209579883455837410L;
 	private int delay;
 	private static Timer timer;
-	private static Random rand = new Random();
 	private PlayingField board;
 	private static SidePanel sidepanel;
 	private Piece piece;
@@ -26,7 +29,6 @@ public class PlayingPanel extends JPanel {
 	 *
 	 * @param sidepanel The other panel that displays info.
 	 */
-	
 	public PlayingPanel(SidePanel sidepanel) {
 		addKeyListener(new KeyboardListener());
 		setFocusable(true);
@@ -34,7 +36,7 @@ public class PlayingPanel extends JPanel {
 		timer = new Timer(delay, new TimerListener());
 		timer.start();
 		
-		this.sidepanel = sidepanel;
+		PlayingPanel.sidepanel = sidepanel;
 		board = sidepanel.getBoard();
 		piece = sidepanel.createPiece();
 		
@@ -42,13 +44,8 @@ public class PlayingPanel extends JPanel {
 	}
 	
 	/**
-	 * Lowers the delay for the timer to make the pieces drop faster.
+	 * Tells you that you lost then restarts the game.
 	 */
-	
-	/**
-	 * Tells you that you lost then restars the game.
-	 */
-	
 	public void youLose() {
 		JOptionPane.showMessageDialog(this, "YOU LOST!");
 		board = new PlayingField();
@@ -61,11 +58,10 @@ public class PlayingPanel extends JPanel {
 	 * 
 	 * @param g The graphics.
 	 */
-	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		board.draw(g);
-		piece.draw(g, board.getWSize(), board.getHSize());
+		piece.draw(g, board.getWSize(), board.getHSize(), true);
 		
 		if (sidepanel.getChangeDelay() && board.getScore() % 5 == 0) {
 			if (delay > 50) {
@@ -82,7 +78,6 @@ public class PlayingPanel extends JPanel {
 	 * @author Bradley Oesch
 	 * @version 1.0
 	 */
-	
 	private class KeyboardListener implements KeyListener {
 		
 		public void keyPressed(KeyEvent e) {
@@ -123,7 +118,6 @@ public class PlayingPanel extends JPanel {
 	 * @author Bradley Oesch
 	 * @version 1.0
 	 */
-	
 	private class TimerListener implements ActionListener {
 		
 		public void actionPerformed(ActionEvent event) {

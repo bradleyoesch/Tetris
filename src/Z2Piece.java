@@ -1,3 +1,4 @@
+
 import java.awt.*;
 
 /**
@@ -9,13 +10,14 @@ import java.awt.*;
 
 public class Z2Piece extends Piece {
 		
+	private static final long serialVersionUID = 6580112566089103176L;
+
 	public Z2Piece() {
 		super();
 		rots = 4;
-		rows = 3;
-		cols = 3;
+		size = 3;
 		color = Color.RED;
-		model = new int[rots][rows][cols];
+		model = new int[rots][size][size];
 		model[0] = new int[][]{{1,1,0},{0,1,1},{0,0,0}};
 		model[1] = new int[][]{{0,0,1},{0,1,1},{0,1,0}};
 		model[2] = new int[][]{{0,0,0},{1,1,0},{0,1,1}};

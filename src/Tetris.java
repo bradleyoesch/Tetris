@@ -1,6 +1,6 @@
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+
+import javax.swing.JFrame;
 
 /**
  * Runs the Tetris game.
@@ -17,8 +17,8 @@ public class Tetris {
 		SidePanel sidepanel = new SidePanel();
 		frame.getContentPane().add(sidepanel, BorderLayout.WEST);
 		frame.getContentPane().add(new PlayingPanel(sidepanel));
-		frame.pack();
-		frame.setVisible(true);
 		frame.setResizable(false);
+		frame.setVisible(true);
+		frame.pack();
 	}
 }

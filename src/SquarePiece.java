@@ -1,4 +1,4 @@
-import java.awt.*;
+import java.awt.Color;
 
 /**
  * The square piece. Makes a square shape.
@@ -9,13 +9,14 @@ import java.awt.*;
 
 public class SquarePiece extends Piece {
 	
+	private static final long serialVersionUID = 4931639188212379548L;
+
 	public SquarePiece() {
 		super();
 		rots = 1;
-		rows = 2;
-		cols = 2;
+		size = 2;
 		color = Color.YELLOW;
-		model = new int[rots][rows][cols];
+		model = new int[rots][size][size];
 		model[0] = new int[][]{{1,1},{1,1}};
 	}
 }

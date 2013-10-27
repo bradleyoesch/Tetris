@@ -1,9 +1,9 @@
-import java.awt.*;
-import javax.swing.*;
-import java.io.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.io.Serializable;
 
 /**
- * The Tetris board itself. Holds the number of columns, rows, score, and level.
+ * The Tetris board itself. Holds the number of columns, rows, the score, and level.
  * 
  * @author Bradley Oesch
  * @version 1.0
@@ -11,7 +11,8 @@ import java.io.*;
 
 public class PlayingField implements Serializable {
 	
-	private int rows, cols, wSize, hSize, off, width, height, score, level, clearCount;
+	private static final long serialVersionUID = -4314427948139234454L;
+	private int rows, cols, wSize, hSize, off, width, height, score, level, lines, clearCount;
 	private static Color[][] board;
 	
 	public PlayingField() {
@@ -25,16 +26,17 @@ public class PlayingField implements Serializable {
 		board = new Color[rows][cols];
 		score = 0;
 		level = 1;
+		lines = 0;
 		clearCount = 0;
 	}
 	
 	/**
 	 * Checks if any rows are completely full.
 	 */
-	
 	public void checkForClears() {
-		int count = 0;
+		int count;
 		for (int i=rows-1; i>=off; i--) {
+			count = 0;
 			for (int j=off; j<cols; j++) {
 				if (board[i][j] != null) {
 					count++;
@@ -46,23 +48,24 @@ public class PlayingField implements Serializable {
 				clearCount++;
 			}
 			count = 0;
-		}
-		if (clearCount == 5) {
-			level++;
-			clearCount = 0;
+			if (clearCount == (3 + 2*level)) {
+				level++;
+				clearCount = 0;
+			}
 		}
 	}
 	
 	/**
-	 * Clears the current row and sets it as the row above.
+	 * Sets each row as row above it, effectively moving all rows down one, 
+	 * which clears the row.
 	 */
-	
 	public void clearRow(int x) {
 		for (int i=x; i>0; i--) {
 			for (int j=off; j<cols; j++) {
 				board[i][j] = board[i-1][j];
 			}
 		}
+		lines++;
 	}
 	
 	/**
@@ -70,7 +73,6 @@ public class PlayingField implements Serializable {
 	 *
 	 * @return Whether the user lost the game.
 	 */
-	
 	public boolean isLossConditionMet() {
 		for (int j=off; j<cols; j++) {
 			if (board[off][j] != null) {
@@ -85,7 +87,6 @@ public class PlayingField implements Serializable {
 	 *
 	 * @return If the current tile is vacant.
 	 */
-	
 	public boolean isTileVacant(int i, int j) {
 		if (board[i][j] == null)
 			return true;
@@ -96,7 +97,6 @@ public class PlayingField implements Serializable {
 	/**
 	 * Fills the tile on the board.
 	 */
-	
 	public void fillTile(int i, int j, Color color) {
 		board[i][j] = color;
 	}
@@ -104,7 +104,6 @@ public class PlayingField implements Serializable {
 	/**
 	 * Draws the board.
 	 */
-	
 	public void draw(Graphics g) {
 		for (int i=off; i<rows; i++) {
 			for (int j=off; j<cols; j++) {
@@ -123,7 +122,6 @@ public class PlayingField implements Serializable {
 	 *
 	 * @return The level.
 	 */
-	
 	public int getLevel() {
 		return level;
 	}
@@ -133,7 +131,6 @@ public class PlayingField implements Serializable {
 	 *
 	 * @return The tile width.
 	 */
-	
 	public int getWSize() {
 		return wSize;
 	}
@@ -143,7 +140,6 @@ public class PlayingField implements Serializable {
 	 *
 	 * @return The tile height.
 	 */
-	
 	public int getHSize() {
 		return hSize;
 	}
@@ -153,7 +149,6 @@ public class PlayingField implements Serializable {
 	 *
 	 * @return The width.
 	 */
-	
 	public int getWidth() {
 		return width;
 	}
@@ -163,18 +158,16 @@ public class PlayingField implements Serializable {
 	 *
 	 * @return The height.
 	 */
-	
 	public int getHeight() {
 		return height;
 	}
 	
 	/**
-	 * Returns the off amount (number of rows/cols that are part of the board
+	 * Returns the off amount (number of rows/cols that are part of the board)
 	 * but not painted onto the panel.
 	 *
 	 * @return The off amount.
 	 */
-	
 	public int getOff() {
 		return off;
 	}
@@ -184,7 +177,6 @@ public class PlayingField implements Serializable {
 	 *
 	 * @return The number of rows.
 	 */
-	
 	public int getRows() {
 		return rows;
 	}
@@ -194,7 +186,6 @@ public class PlayingField implements Serializable {
 	 *
 	 * @return The number of columns.
 	 */
-	
 	public int getCols() {
 		return cols;
 	}
@@ -204,8 +195,16 @@ public class PlayingField implements Serializable {
 	 *
 	 * @return The score.
 	 */
-	
 	public int getScore() {
 		return score;
+	}
+	
+	/**
+	 * Returns the number of lines that have been cleared.
+	 *
+	 * @return The lines.
+	 */
+	public int getLines() {
+		return lines;
 	}
 }

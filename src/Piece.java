@@ -1,6 +1,6 @@
-import java.awt.*;
-import javax.swing.*;
-import java.io.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.io.Serializable;
 
 /**
  * The piece. Holds the current row, column, rotation, color, and model.
@@ -8,11 +8,11 @@ import java.io.*;
  * @author Bradley Oesch
  * @version 1.0
  */
-
 abstract public class Piece implements Serializable {
 	
-	protected int row, col, rot = 0;
-	protected int rots, rows, cols;
+	private static final long serialVersionUID = -5883485777814752565L;
+	protected int rot, row, col = 0; //current piece rotation and row/col location on board
+	protected int rots, size;  //number of rotations and the full size of the pi
 	protected Color color;
 	protected int[][][] model;
 	protected static PlayingField board = new PlayingField();
@@ -23,19 +23,17 @@ abstract public class Piece implements Serializable {
 	}
 	
 	/**
-	 * Moves the piece one left, right, or down.
+	 * Moves the piece one slot left, right, or down.
 	 *
 	 * @param direction Which direction the piece is to move.
 	 * @return Whether the user lost the game.
 	 */
-	
 	public boolean move(char direction) {
 		int count1 = 0, count2 = 0, icount = 0;
-		boolean canMove = true;
 		switch (direction) {
 			case 'l':
-				for (int i=0; i<rows; i++) {
-					for (int j=0; j<cols; j++) {
+				for (int i=0; i<size; i++) {
+					for (int j=0; j<size; j++) {
 						if (model[rot][i][j] == 1) {
 							if (col+j > board.getOff()) {
 								if (board.isTileVacant(row+i,col+j-1))
@@ -51,8 +49,8 @@ abstract public class Piece implements Serializable {
 					return false;
 				}
 			case 'r':
-				for (int i=0; i<rows; i++) {
-					for (int j=0; j<cols; j++) {
+				for (int i=0; i<size; i++) {
+					for (int j=0; j<size; j++) {
 						if (model[rot][i][j] == 1) {
 							if (col+j+1 < board.getCols()) {
 								if (board.isTileVacant(row+i,col+j+1))
@@ -68,11 +66,11 @@ abstract public class Piece implements Serializable {
 					return false;
 				}
 			case 'd':
-				for (int i=0; i<rows; i++) {
-					for (int j=0; j<cols; j++) {
+				for (int i=0; i<size; i++) {
+					for (int j=0; j<size; j++) {
 						if (model[rot][i][j] == 1){
 							icount = i; //finds lowest row
-							if (i+1 < rows && model[rot][i+1][j] == 0) {
+							if (i+1 < size && model[rot][i+1][j] == 0) {
 								count1++;
 								if (row+icount+1 < board.getRows() && board.isTileVacant(row+i+1, col+j)) {
 									count2++;
@@ -81,7 +79,7 @@ abstract public class Piece implements Serializable {
 						}
 					}
 				}
-				for (int j=0; j<cols; j++) {
+				for (int j=0; j<size; j++) {
 					if (model[rot][icount][j] == 1) {
 						count1++;
 						if (row+icount+1 < board.getRows()) {
@@ -112,15 +110,14 @@ abstract public class Piece implements Serializable {
 	 *
 	 * @return If the piece rotates or not.
 	 */
-	
  	public boolean rotate() {
 		int count = 0;
 		int jLowCount = 100;
 		int jHighCount = 0;
 		int iHighCount = 0;
-		for (int i=0; i<rows; i++) {
-			for (int j=0; j<cols; j++) {
-				if (model[(rot+1)%rots][i][j] == 1) {
+		for (int i=0; i<size; i++) {
+			for (int j=0; j<size; j++) {
+				if (model[(rot+1) % rots][i][j] == 1) {
 					if(j < jLowCount)
 						jLowCount = j;
 					if (j > jHighCount)
@@ -133,14 +130,14 @@ abstract public class Piece implements Serializable {
 		
 		if (jLowCount+col < board.getOff())
 			col = board.getOff();
-		else if (jHighCount+col > board.getCols()-cols)
-			col = board.getCols()-cols;
-		else if (iHighCount+row > board.getRows()-rows)
-			row = board.getRows()-rows;
+		else if (jHighCount+col > board.getCols()-size)
+			col = board.getCols()-size;
+		else if (iHighCount+row > board.getRows()-size)
+			row = board.getRows()-size;
 			
-		for (int i=0; i<rows; i++) {
-			for (int j=0; j<cols; j++) {
-				if (model[(rot+1)%rots][i][j] == 1) {
+		for (int i=0; i<size; i++) {
+			for (int j=0; j<size; j++) {
+				if (model[(rot+1) % rots][i][j] == 1) {
 					if (board.isTileVacant(row+i,col+j))
 						count += 1;
 				}
@@ -158,10 +155,9 @@ abstract public class Piece implements Serializable {
 	/**
 	 * Settles the piece as low as it can move.
 	 */
-	
 	public void settle() {
-		for (int i=0; i<rows; i++) {
-			for (int j=0; j<cols; j++) {
+		for (int i=0; i<size; i++) {
+			for (int j=0; j<size; j++) {
 				if (model[rot][i][j] == 1) {
 					board.fillTile(row+i, col+j, color);
 				}
@@ -170,49 +166,36 @@ abstract public class Piece implements Serializable {
 	}
 	
 	/**
-	 * Draws the piece for the board.
+	 * Draws the piece on the main board or next piece board.
 	 * 
 	 * @param g The graphics
 	 * @param wSize Width of the piece.
 	 * @param hSize Height of the piece.
+	 * @param paintToBoard True if painting to main board, false if painting to next piece board.
 	 */
-	
-	public void draw(Graphics g, int wSize, int hSize) {
+	public void draw(Graphics g, int wSize, int hSize, boolean paintToBoard) {
 		g.setColor(color);
-		for (int i=0; i<rows; i++) {
-			for (int j=0; j<cols; j++) {
-				if (model[rot][i][j] == 1) {
-					g.fill3DRect((col+j-board.getOff())*wSize, (row+i-board.getOff())*hSize, wSize, hSize, true);
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Draws the piece for the next piece.
-	 * 
-	 * @param g The graphics
-	 * @param wSize Width of the piece.
-	 * @param hSize Height of the piece.
-	 * @param bool Arbitrary parameter to make a different draw method.
-	 */
-	
-	public void draw(Graphics g, int wSize, int hSize, boolean bool) {
-		g.setColor(color);
+		int tempRot = rot;
 		double a = 0, b = 0;
-		if (rows == 2) {
-			a = 1;
-			b = 1;
-		} else if (rows == 3) {
-			a = .5;
-			b = 1;
-		} else if (rows == 4) {
-			b = .5;
+		if (!paintToBoard) {
+			if (size == 2) {
+				a = 1;
+				b = 1;
+			} else if (size == 3) {
+				a = .5;
+				b = 1;
+			} else if (size == 4) {
+				b = .5;
+			}
+			tempRot = 0;
 		}
-		for (int i=0; i<rows; i++) {
-			for (int j=0; j<cols; j++) {
-				if (model[0][i][j] == 1) {
-					g.fill3DRect((int)((a+j)*wSize), (int)((b+i)*hSize), wSize, hSize, true);
+		for (int i=0; i<size; i++) {
+			for (int j=0; j<size; j++) {
+				if (model[tempRot][i][j] == 1) {
+					if (paintToBoard)
+						g.fill3DRect((col+j-board.getOff())*wSize, (row+i-board.getOff())*hSize, wSize, hSize, true);
+					else
+						g.fill3DRect((int)((a+j)*wSize), (int)((b+i)*hSize), wSize, hSize, true);
 				}
 			}
 		}
