@@ -7,4 +7,4 @@ Run 'java Tetris' in the command prompt to run the game.
 
 Updates to saving and loading games coming soon, as they may not work perfectly right now.
 
-![Screenshot](https://github.com/bradleyoesch/Tetris/Screenshot.jpg)
+![Screenshot](https://raw.github.com/bradleyoesch/Tetris/master/Screenshot.jpg)
