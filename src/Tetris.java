@@ -19,5 +19,6 @@ public class Tetris {
 		frame.getContentPane().add(new PlayingPanel(sidepanel));
 		frame.pack();
 		frame.setVisible(true);
+		frame.setResizable(false);
 	}
 }
